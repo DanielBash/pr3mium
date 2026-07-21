@@ -1,10 +1,10 @@
-import sqlite3
-from telethon import TelegramClient, events
 import asyncio
 import random
 
-API_ID = 0
-API_HASH = "hash"
+from telethon import TelegramClient, events
+
+API_ID = 0  # сюда айдишник
+API_HASH = "хещ_сюды"
 SESSION_NAME = "userbot"
 
 client = TelegramClient(SESSION_NAME, API_ID, API_HASH)
@@ -12,36 +12,130 @@ db = {'messages': {}, 'me': None}
 animations = {
     'загрузка': {
         'frames': ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'] * 3,
-        'speed': 0.1
+        'speed': 0.0
     }
 }
 recording = False
 current_recording = {}
 
+_heart_mask = [ # да я крут и просто это генерю при запуске
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 1, 1, 0, 0, 1, 1, 0, 0],
+    [0, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+    [0, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+    [0, 0, 1, 1, 1, 1, 1, 1, 0, 0],
+    [0, 0, 0, 1, 1, 1, 1, 0, 0, 0],
+    [0, 0, 0, 0, 1, 1, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+]
+
+_W = '🤍'
+_R = '❤️'
+_hc = ['❤️', '🧡', '💛', '💚', '💙', '💜', '🤎', '🖤', '🤍', '💖']
+_rc = _hc
+
+_love_frames = []
+
+for _f in range(12):
+    _t = _f / 11.0
+    _rows = []
+    for _row in _heart_mask:
+        _ch = []
+        for _v in _row:
+            if _v:
+                _ch.append(_R if random.random() < _t else random.choice(_rc))
+            else:
+                _ch.append(random.choice(_rc)
+                           if random.random() < (1 - _t) * 0.4
+                           else _W)
+        _rows.append(''.join(_ch).rstrip())
+    _love_frames.append('\n'.join(_rows))
+
+_yv = ['You', 'yOu', 'yoU']
+for _i in range(10):
+    _love_frames.append(f"I {_hc[_i % 10]} {_yv[_i % 3]}")
+_w = "Love"
+for _k in range(30):
+    _rows = []
+    for _r in range(8):
+        _ch = []
+        for _c in range(10):
+            _p = _r * 10 + (_c if _r % 2 == 0 else 9 - _c)
+            _ch.append(_w[(_p + _k) % 4])
+        _rows.append(''.join(_ch).rstrip())
+    _love_frames.append('\n'.join(_rows))
+
+_love_frames.append("Любовь морковь")
+
+animations['любовь'] = {
+    'frames': _love_frames,
+    'speed': 0.1
+}
+
+_fuck_frames = []
+
+for _emoji in ['✊', '🖐', '✌️', '🖕']:
+    for _ in range(3):
+        _fuck_frames.append(_emoji)
+for _ in range(6):
+    _fuck_frames.append('🤨🖕')
+    _fuck_frames.append('🤨🖕')
+    _fuck_frames.append('🖕🤨')
+    _fuck_frames.append('🖕🤨')
+
+_kao_1 = '╭∩╮(•̀_·́)╭∩╮'
+_kao_2 = '╭∩╮(·́_•̀)╭∩╮'
+for _ in range(3):
+    _fuck_frames.append(_kao_1)
+    _fuck_frames.append(_kao_1)
+    _fuck_frames.append(_kao_2)
+    _fuck_frames.append(_kao_2)
+
+_txt = 'ᶠᶸᶜᵏᵧₒᵤ!🖕'
+for _i in range(1, len(_txt) + 1):
+    _fuck_frames.append(_txt[:_i])
+    _fuck_frames.append(_txt[:_i])
+
+animations['фак'] = {
+    'frames': _fuck_frames,
+    'speed': 0.1
+}
+
+
 async def log(message):
     await client.send_message('me', f'[pr3mium] {message}')
     print(message)
 
+
 async def animate(event, animation):
     for frame in animation['frames']:
-        await event.edit(frame)
+        try:
+            await event.edit(frame)
+        except Exception:
+            pass
         await asyncio.sleep(animation['speed'])
+
 
 async def effect(event, text):
     for i in range(len(text)):
         if text[i] not in '\n \t':
-            await event.edit(text[:i+1])
+            try:
+                await event.edit(text[:i + 1])
+            except Exception:
+                pass
             await asyncio.sleep(0.05)
+
 
 async def handle_command(event):
     global recording, current_recording
     text = event.raw_text
     if text.startswith('/п'):
-        await log('Хьюстон, у нас нет проблем!')
+        await evend.edit('Хьюстон, у нас нет проблем!')
         await event.delete()
     elif text.startswith('/а'):
         if text == '/а':
-            await event.edit('/а <название> — проиграть\n/а список\n/а запись <название> <скорость>\n/а стоп\n/а удалить <название>')
+            await event.edit(
+                '/а <название> — проиграть\n/а список\n/а запись <название> <скорость>\n/а стоп\n/а удалить <название>')
             return
         args = text[3:].strip()
         if args == 'список':
@@ -96,11 +190,12 @@ async def handle_command(event):
     elif text.startswith('/э'):
         parts = text.split(maxsplit=1)
         if len(parts) != 2:
-            await log('Использование: /э[ффетно] <текст>')
+            await event.edit('Использование: /э[ффетно] <текст>')
             return
         await effect(event, parts[1])
     elif text.startswith('/с'):
-        await log('Pr3mium - бот: /п, /а, /э, /с')
+        await event.edit('Pr3mium - бот: /п, /а, /э, /с')
+
 
 @client.on(events.NewMessage(outgoing=True))
 async def on_my_message(event):
@@ -110,6 +205,7 @@ async def on_my_message(event):
         return
     if event.raw_text.startswith('/'):
         await handle_command(event)
+
 
 @client.on(events.NewMessage)
 async def on_new(event):
@@ -121,9 +217,9 @@ async def on_new(event):
         'text': event.raw_text or "",
     }
 
+
 @client.on(events.MessageDeleted)
 async def on_deleted(event):
-    chat_id = event.chat_id
     for msg_id in event.deleted_ids:
         key = msg_id
         if key in db['messages']:
@@ -133,12 +229,14 @@ async def on_deleted(event):
             else:
                 await log(f'Удалено сообщение от Анонима. Текст: {db["messages"][key]["text"]}')
 
+
 async def main():
     await client.start()
     me = await client.get_me()
     db['me'] = me
     username = me.username or "Анонимус"
     await log(f'Телеграм pr3mium активирован для пользователя: @{username}')
+
 
 with client:
     client.loop.run_until_complete(main())
