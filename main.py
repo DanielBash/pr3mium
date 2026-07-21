@@ -1,4 +1,3 @@
-import sqlite3
 from telethon import TelegramClient, events
 import asyncio
 import random
