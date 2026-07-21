@@ -1,10 +1,10 @@
+import sqlite3
+from telethon import TelegramClient, events
 import asyncio
 import random
 
-from telethon import TelegramClient, events
-
-API_ID = 0  # сюда айдишник
-API_HASH = "хещ_сюды"
+API_ID = a
+API_HASH = "a"
 SESSION_NAME = "userbot"
 
 client = TelegramClient(SESSION_NAME, API_ID, API_HASH)
@@ -18,20 +18,20 @@ animations = {
 recording = False
 current_recording = {}
 
-_heart_mask = [ # да я крут и просто это генерю при запуске
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 1, 1, 0, 0, 1, 1, 0, 0],
-    [0, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-    [0, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-    [0, 0, 1, 1, 1, 1, 1, 1, 0, 0],
-    [0, 0, 0, 1, 1, 1, 1, 0, 0, 0],
-    [0, 0, 0, 0, 1, 1, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+_heart_mask = [
+    [0,0,0,0,0,0,0,0,0,0],
+    [0,0,1,1,0,0,1,1,0,0],
+    [0,1,1,1,1,1,1,1,1,0],
+    [0,1,1,1,1,1,1,1,1,0],
+    [0,0,1,1,1,1,1,1,0,0],
+    [0,0,0,1,1,1,1,0,0,0],
+    [0,0,0,0,1,1,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0],
 ]
 
-_W = '🤍'
-_R = '❤️'
-_hc = ['❤️', '🧡', '💛', '💚', '💙', '💜', '🤎', '🖤', '🤍', '💖']
+_W  = '🤍'
+_R  = '❤️'
+_hc = ['❤️','🧡','💛','💚','💙','💜','🤎','🖤','🤍','💖']
 _rc = _hc
 
 _love_frames = []
@@ -91,6 +91,7 @@ for _ in range(3):
     _fuck_frames.append(_kao_2)
     _fuck_frames.append(_kao_2)
 
+
 _txt = 'ᶠᶸᶜᵏᵧₒᵤ!🖕'
 for _i in range(1, len(_txt) + 1):
     _fuck_frames.append(_txt[:_i])
@@ -101,11 +102,9 @@ animations['фак'] = {
     'speed': 0.1
 }
 
-
 async def log(message):
     await client.send_message('me', f'[pr3mium] {message}')
     print(message)
-
 
 async def animate(event, animation):
     for frame in animation['frames']:
@@ -115,16 +114,14 @@ async def animate(event, animation):
             pass
         await asyncio.sleep(animation['speed'])
 
-
 async def effect(event, text):
     for i in range(len(text)):
         if text[i] not in '\n \t':
             try:
-                await event.edit(text[:i + 1])
+                await event.edit(text[:i+1])
             except Exception:
                 pass
             await asyncio.sleep(0.05)
-
 
 async def handle_command(event):
     global recording, current_recording
@@ -134,8 +131,7 @@ async def handle_command(event):
         await event.delete()
     elif text.startswith('/а'):
         if text == '/а':
-            await event.edit(
-                '/а <название> — проиграть\n/а список\n/а запись <название> <скорость>\n/а стоп\n/а удалить <название>')
+            await event.edit('/а <название> — проиграть\n/а список\n/а запись <название> <скорость>\n/а стоп\n/а удалить <название>')
             return
         args = text[3:].strip()
         if args == 'список':
@@ -196,7 +192,6 @@ async def handle_command(event):
     elif text.startswith('/с'):
         await event.edit('Pr3mium - бот: /п, /а, /э, /с')
 
-
 @client.on(events.NewMessage(outgoing=True))
 async def on_my_message(event):
     global recording, current_recording
@@ -205,7 +200,6 @@ async def on_my_message(event):
         return
     if event.raw_text.startswith('/'):
         await handle_command(event)
-
 
 @client.on(events.NewMessage)
 async def on_new(event):
@@ -217,9 +211,9 @@ async def on_new(event):
         'text': event.raw_text or "",
     }
 
-
 @client.on(events.MessageDeleted)
 async def on_deleted(event):
+    chat_id = event.chat_id
     for msg_id in event.deleted_ids:
         key = msg_id
         if key in db['messages']:
@@ -229,14 +223,12 @@ async def on_deleted(event):
             else:
                 await log(f'Удалено сообщение от Анонима. Текст: {db["messages"][key]["text"]}')
 
-
 async def main():
     await client.start()
     me = await client.get_me()
     db['me'] = me
     username = me.username or "Анонимус"
     await log(f'Телеграм pr3mium активирован для пользователя: @{username}')
-
 
 with client:
     client.loop.run_until_complete(main())
