@@ -3,7 +3,7 @@ from telethon import TelegramClient, events
 import asyncio
 import random
 
-API_ID = a
+API_ID = 0
 API_HASH = "a"
 SESSION_NAME = "userbot"
 
@@ -127,7 +127,7 @@ async def handle_command(event):
     global recording, current_recording
     text = event.raw_text
     if text.startswith('/п'):
-        await evend.edit('Хьюстон, у нас нет проблем!')
+        await event.edit('Хьюстон, у нас нет проблем!')
         await event.delete()
     elif text.startswith('/а'):
         if text == '/а':
@@ -213,7 +213,6 @@ async def on_new(event):
 
 @client.on(events.MessageDeleted)
 async def on_deleted(event):
-    chat_id = event.chat_id
     for msg_id in event.deleted_ids:
         key = msg_id
         if key in db['messages']:
